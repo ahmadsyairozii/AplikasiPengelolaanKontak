@@ -24,7 +24,7 @@ public class DatabaseHelper {
     public static Connection koneksidb() {
         try {
             Class.forName("org.sqlite.JDBC");
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:E:\\NETBEANS PROJECT\\AplikasiPengelolaanKontak\\kontak.db"); // Perbaiki URL koneksi
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:D:\\Documents\\NetBeansProjects\\AplikasiPengelolaanKontak\\kontak.db"); // Perbaiki URL koneksi
             //JOptionPane.showMessageDialog(null, "Terhubung");
             return conn;
         } catch (Exception e) {
@@ -34,11 +34,11 @@ public class DatabaseHelper {
     }
 
     // Menambahkan kontak baru ke database
-    public static void addKontak(String nama, String nomorhp, String kategori) throws SQLException {
-        String sql = "INSERT INTO kontak(nama, nomorhp, kategori) VALUES(?, ?, ?)";
+    public static void addKontak(String nama, String nomor_telepon, String kategori) throws SQLException {
+        String sql = "INSERT INTO kontak(nama, nomor_telepon, kategori) VALUES(?, ?, ?)";
         try (Connection conn = koneksidb(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, nama);
-            pstmt.setString(2, nomorhp);
+            pstmt.setString(2, nomor_telepon);
             pstmt.setString(3, kategori);
             pstmt.executeUpdate();
         }
@@ -47,13 +47,13 @@ public class DatabaseHelper {
     // Mendapatkan semua kontak dari database
     public static List<Kontak> getKontak() throws SQLException {
         List<Kontak> kontak = new ArrayList<>();
-        String sql = "SELECT * FROM contacts";
+        String sql = "SELECT * FROM kontak";
         try (Connection conn = koneksidb(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 Kontak kontakk = new Kontak(
                     rs.getInt("id"),
                     rs.getString("nama"),
-                    rs.getString("nomorhp"),
+                    rs.getString("nomor_telepon"),
                     rs.getString("kategori")
                 );
                 kontak.add(kontakk);
@@ -63,11 +63,11 @@ public class DatabaseHelper {
     }
 
     // Mengupdate data kontak
-    public static void updateKontak(int id, String nama, String nomorhp, String kategori) throws SQLException {
-        String sql = "UPDATE kontak SET nama = ?, nomorhp = ?, kategori = ? WHERE id = ?";
+    public static void updateKontak(int id, String nama, String nomor_telepon, String kategori) throws SQLException {
+        String sql = "UPDATE kontak SET nama = ?, nomor_telepon = ?, kategori = ? WHERE id = ?";
         try (Connection conn = koneksidb(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, nama);
-            pstmt.setString(2, nomorhp);
+            pstmt.setString(2, nomor_telepon);
             pstmt.setString(3, kategori);
             pstmt.setInt(4, id);
             pstmt.executeUpdate();
@@ -76,7 +76,7 @@ public class DatabaseHelper {
 
     // Menghapus kontak dari database
     public static void deleteKontak(int id) throws SQLException {
-        String sql = "DELETE FROM contacts WHERE id = ?";
+        String sql = "DELETE FROM kontak WHERE id = ?";
         try (Connection conn = koneksidb(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
@@ -86,7 +86,7 @@ public class DatabaseHelper {
     // Mencari kontak berdasarkan nama atau nomor telepon
     public static List<Kontak> cariKontak(String keyword) throws SQLException {
         List<Kontak> kontak = new ArrayList<>();
-        String sql = "SELECT * FROM kontak WHERE name LIKE ? OR phone LIKE ?";
+        String sql = "SELECT * FROM kontak WHERE nama LIKE ? OR nomor_telepon LIKE ?";
         try (Connection conn = koneksidb(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, "%" + keyword + "%");
             pstmt.setString(2, "%" + keyword + "%");
@@ -94,9 +94,9 @@ public class DatabaseHelper {
             while (rs.next()) {
                 Kontak kontakk = new Kontak(
                     rs.getInt("id"),
-                    rs.getString("name"),
-                    rs.getString("phone"),
-                    rs.getString("category")
+                    rs.getString("nama"),
+                    rs.getString("nomor_telepon"),
+                    rs.getString("kategori")
                 );
                 kontak.add(kontakk);
             }

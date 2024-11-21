@@ -5,6 +5,13 @@
  */
 package aplikasipengelolaankontak;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author User
@@ -14,8 +21,9 @@ public class PengelolaanKontakFrame extends javax.swing.JFrame {
     /**
      * Creates new form PengelolaanKontakFrame
      */
-    public PengelolaanKontakFrame() {
+    public PengelolaanKontakFrame() throws SQLException {
         initComponents();
+        refreshContactTable();
     }
 
     /**
@@ -38,10 +46,10 @@ public class PengelolaanKontakFrame extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
+        txtSearch = new javax.swing.JTextField();
         jButton4 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tableContacts = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -60,17 +68,37 @@ public class PengelolaanKontakFrame extends javax.swing.JFrame {
         comboCategory.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Keluarga", "Teman", "Kerja" }));
 
         jButton1.setText("Konversi Tambah");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Edit");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Hapus");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
         jLabel4.setText("Cari Kontak yang bersangkutan :");
 
         jButton4.setText("Cari");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tableContacts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -81,7 +109,12 @@ public class PengelolaanKontakFrame extends javax.swing.JFrame {
                 "ID", "Nama", "Nomor HP", "Kategori"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        tableContacts.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableContactsMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tableContacts);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -93,7 +126,7 @@ public class PengelolaanKontakFrame extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -141,7 +174,7 @@ public class PengelolaanKontakFrame extends javax.swing.JFrame {
                         .addGap(24, 24, 24)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -163,6 +196,29 @@ public class PengelolaanKontakFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        addKontak();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        editKontak();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        deleteKontak();
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        cariKontak();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void tableContactsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableContactsMouseClicked
+        int row = tableContacts.getSelectedRow();
+        txtNama.setText(tableContacts.getValueAt(row, 1).toString());
+        txtPhone.setText(tableContacts.getValueAt(row, 2).toString());
+        comboCategory.setSelectedItem(tableContacts.getValueAt(row, 3).toString());
+    }//GEN-LAST:event_tableContactsMouseClicked
 
     /**
      * @param args the command line arguments
@@ -194,7 +250,11 @@ public class PengelolaanKontakFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new PengelolaanKontakFrame().setVisible(true);
+                try {
+                    new PengelolaanKontakFrame().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(PengelolaanKontakFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -211,9 +271,125 @@ public class PengelolaanKontakFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTable tableContacts;
     private javax.swing.JTextField txtNama;
     private javax.swing.JTextField txtPhone;
+    private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
+
+    private void addKontak() {
+        String nama = txtNama.getText();
+        String nomor_telepon = txtPhone.getText();
+        String kategori = (String) comboCategory.getSelectedItem();
+
+        if (nama.isEmpty() || nomor_telepon.isEmpty() || kategori.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Isi semua data kontak!");
+            return;
+        }
+
+        if (!nomor_telepon.matches("\\d+")) {
+            JOptionPane.showMessageDialog(null, "Nomor telepon hanya boleh berisi angka!");
+            return;
+        }
+
+        try {
+            DatabaseHelper.addKontak(nama, nomor_telepon, kategori);
+            refreshContactTable();
+            JOptionPane.showMessageDialog(null, "Kontak berhasil ditambahkan!");
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menambahkan kontak.");
+            ex.printStackTrace();
+        }
+    }
+
+    private void refreshContactTable() throws SQLException {
+        List<Kontak> kontak = DatabaseHelper.getKontak();
+        DefaultTableModel model = (DefaultTableModel) tableContacts.getModel();
+        model.setRowCount(0);
+
+        for (Kontak contact : kontak) {
+            model.addRow(new Object[]{contact.getId(), contact.getNama(), contact.getNomorHp(), contact.getKategori()});
+        }
+    }
+
+    private void cariKontak() {
+        String keyword = txtSearch.getText();
+
+        if (keyword.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Masukkan nama atau nomor telepon untuk pencarian!");
+            return;
+        }
+
+        try {
+            List<Kontak> results = DatabaseHelper.cariKontak(keyword);
+            DefaultTableModel model = (DefaultTableModel) tableContacts.getModel();
+            model.setRowCount(0);
+
+            for (Kontak kontak : results) {
+                model.addRow(new Object[]{kontak.getId(), kontak.getNama(), kontak.getNomorHp(), kontak.getKategori()});
+            }
+
+            if (results.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Kontak tidak ditemukan!");
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat mencari kontak.");
+            ex.printStackTrace();
+        }
+    }
+
+    private void editKontak() {
+        int selectedRow = tableContacts.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Pilih kontak yang ingin diedit!");
+            return;
+        }
+
+        int id = (int) tableContacts.getValueAt(selectedRow, 0);
+        String nama = txtNama.getText();
+        String nomor_telepon = txtPhone.getText();
+        String kategori = (String) comboCategory.getSelectedItem();
+
+        if (nama.isEmpty() || nomor_telepon.isEmpty() || kategori.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Isi semua data kontak!");
+            return;
+        }
+
+        if (!nomor_telepon.matches("\\d+")) {
+            JOptionPane.showMessageDialog(null, "Nomor telepon hanya boleh berisi angka!");
+            return;
+        }
+
+        try {
+            DatabaseHelper.updateKontak(id, nama, nomor_telepon, kategori);
+            refreshContactTable();
+            JOptionPane.showMessageDialog(null, "Kontak berhasil diperbarui!");
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat memperbarui kontak.");
+            ex.printStackTrace();
+        }
+    }
+
+    private void deleteKontak() {
+        int selectedRow = tableContacts.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Pilih kontak yang ingin dihapus!");
+            return;
+        }
+
+        int id = (int) tableContacts.getValueAt(selectedRow, 0);
+        int confirm = JOptionPane.showConfirmDialog(null, "Apakah Anda yakin ingin menghapus kontak ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                DatabaseHelper.deleteKontak(id);
+                refreshContactTable();
+                JOptionPane.showMessageDialog(null, "Kontak berhasil dihapus!");
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menghapus kontak.");
+            }
+        }
+    }
 }
