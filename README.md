@@ -1,4 +1,4 @@
-# Latihan 2 - Aplikasi Penghitung Umur.
+# Latihan 3 - Aplikasi Pengelolaan Kontak.
 
 # Biodata Diri :
 Nama   : Ahmad Syairozi<br>
